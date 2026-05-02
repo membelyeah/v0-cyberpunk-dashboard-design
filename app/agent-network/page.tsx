@@ -150,7 +150,7 @@ export default function CablingPage() {
                   </tr>
                 ) : filteredInterfaces.map((iface, index) => (
                   <tr
-                    key={iface.id}
+                    key={iface[".id"]}
                     className="hover:bg-cyan-500/5 transition-colors group"
                   >
                     <td className="py-4 px-6 text-xs text-white font-bold font-mono italic">{iface.name}</td>

@@ -112,7 +112,7 @@ export default function CloudPage() {
                 {loading ? (
                   <tr><td colSpan={6} className="text-center py-20 animate-pulse text-xs">SYNCHRONIZING CLOUD SECRETS...</td></tr>
                 ) : secrets.map((secret) => (
-                  <tr key={secret.id} className="hover:bg-cyan-500/5 group transition-colors">
+                  <tr key={secret[".id"]} className="hover:bg-cyan-500/5 group transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <ShieldCheck className="w-3 h-3 text-cyan-500" />

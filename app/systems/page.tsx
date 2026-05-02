@@ -121,7 +121,7 @@ export default function CyberSecPage() {
                 {loading ? (
                   <tr><td colSpan={6} className="py-20 text-center animate-pulse">ANALYZING FIREWALL LOGS...</td></tr>
                 ) : filters.map((rule, index) => (
-                  <tr key={rule.id} className="hover:bg-neutral-800/50 transition-colors">
+                  <tr key={rule[".id"]} className="hover:bg-neutral-800/50 transition-colors">
                     <td className="px-6 py-4 text-neutral-500">[{index}]</td>
                     <td className="px-6 py-4">
                       <span className={`font-bold uppercase ${rule.action === "drop" ? "text-red-500" : rule.action === "accept" ? "text-green-500" : "text-yellow-500"}`}>
