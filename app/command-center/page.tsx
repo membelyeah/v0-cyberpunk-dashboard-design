@@ -43,24 +43,30 @@ export default function CommandCenterPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="text-center">
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="text-center p-2 bg-cyan-500/5 rounded border border-cyan-500/10">
                 <div className="text-2xl font-bold text-white font-mono tracking-tighter">
                   {loading ? "..." : addressLists?.stage1 || 0}
                 </div>
-                <div className="text-[10px] text-neutral-500 uppercase">Stage 1</div>
+                <div className="text-[10px] text-neutral-500 uppercase">Stage 1: Cabling</div>
               </div>
-              <div className="text-center border-x border-neutral-800">
+              <div className="text-center p-2 bg-cyan-500/5 rounded border border-cyan-500/10">
                 <div className="text-2xl font-bold text-white font-mono tracking-tighter">
                   {loading ? "..." : addressLists?.stage2 || 0}
                 </div>
-                <div className="text-[10px] text-neutral-500 uppercase">Stage 2</div>
+                <div className="text-[10px] text-neutral-500 uppercase">Stage 2: ITNSA</div>
               </div>
-              <div className="text-center">
+              <div className="text-center p-2 bg-cyan-500/5 rounded border border-cyan-500/10">
+                <div className="text-2xl font-bold text-white font-mono tracking-tighter">
+                  {loading ? "..." : addressLists?.stage3 || 0}
+                </div>
+                <div className="text-[10px] text-neutral-500 uppercase">Stage 3: Cloud</div>
+              </div>
+              <div className="text-center p-2 bg-cyan-500/5 rounded border border-cyan-500/10">
                 <div className="text-2xl font-bold text-white font-mono tracking-tighter">
                   {loading ? "..." : addressLists?.stage4 || 0}
                 </div>
-                <div className="text-[10px] text-neutral-500 uppercase">Stage 4</div>
+                <div className="text-[10px] text-neutral-500 uppercase">Stage 4: Cyber Sec</div>
               </div>
             </div>
 

@@ -1,432 +1,154 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import {
-  Server,
-  Database,
-  Shield,
-  Wifi,
-  HardDrive,
-  Cpu,
-  Activity,
-  AlertTriangle,
-  CheckCircle,
-  Settings,
-} from "lucide-react"
+import { ShieldAlert, ShieldCheck, Flame, Bug, Lock, HardDrive, Terminal } from "lucide-react"
 
-export default function SystemsPage() {
-  const [selectedSystem, setSelectedSystem] = useState(null)
+export default function CyberSecPage() {
+  const [filters, setFilters] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const systems = [
-    {
-      id: "SYS-001",
-      name: "COMMAND SERVER ALPHA",
-      type: "Primary Server",
-      status: "online",
-      health: 98,
-      cpu: 45,
-      memory: 67,
-      storage: 34,
-      uptime: "247 days",
-      location: "Data Center 1",
-      lastMaintenance: "2025-05-15",
-    },
-    {
-      id: "SYS-002",
-      name: "DATABASE CLUSTER BETA",
-      type: "Database",
-      status: "online",
-      health: 95,
-      cpu: 72,
-      memory: 84,
-      storage: 78,
-      uptime: "189 days",
-      location: "Data Center 2",
-      lastMaintenance: "2025-06-01",
-    },
-    {
-      id: "SYS-003",
-      name: "SECURITY GATEWAY",
-      type: "Firewall",
-      status: "warning",
-      health: 87,
-      cpu: 23,
-      memory: 45,
-      storage: 12,
-      uptime: "156 days",
-      location: "DMZ",
-      lastMaintenance: "2025-04-20",
-    },
-    {
-      id: "SYS-004",
-      name: "COMMUNICATION HUB",
-      type: "Network",
-      status: "online",
-      health: 92,
-      cpu: 38,
-      memory: 52,
-      storage: 23,
-      uptime: "203 days",
-      location: "Network Core",
-      lastMaintenance: "2025-05-28",
-    },
-    {
-      id: "SYS-005",
-      name: "BACKUP STORAGE ARRAY",
-      type: "Storage",
-      status: "maintenance",
-      health: 76,
-      cpu: 15,
-      memory: 28,
-      storage: 89,
-      uptime: "0 days",
-      location: "Backup Facility",
-      lastMaintenance: "2025-06-17",
-    },
-    {
-      id: "SYS-006",
-      name: "ANALYTICS ENGINE",
-      type: "Processing",
-      status: "online",
-      health: 94,
-      cpu: 89,
-      memory: 76,
-      storage: 45,
-      uptime: "134 days",
-      location: "Data Center 1",
-      lastMaintenance: "2025-05-10",
-    },
-  ]
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "online":
-        return "bg-white/20 text-white"
-      case "warning":
-        return "bg-orange-500/20 text-orange-500"
-      case "maintenance":
-        return "bg-neutral-500/20 text-neutral-300"
-      case "offline":
-        return "bg-red-500/20 text-red-500"
-      default:
-        return "bg-neutral-500/20 text-neutral-300"
+  useEffect(() => {
+    const fetchFilters = async () => {
+      try {
+        const res = await fetch("/api/mikrotik/firewall-filters")
+        const data = await res.json()
+        if (Array.isArray(data)) {
+          setFilters(data)
+        }
+        setLoading(false)
+      } catch (error) {
+        console.error("Failed to fetch firewall filters:", error)
+      }
     }
-  }
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "online":
-        return <CheckCircle className="w-4 h-4" />
-      case "warning":
-        return <AlertTriangle className="w-4 h-4" />
-      case "maintenance":
-        return <Settings className="w-4 h-4" />
-      case "offline":
-        return <AlertTriangle className="w-4 h-4" />
-      default:
-        return <Activity className="w-4 h-4" />
-    }
-  }
+    fetchFilters()
+    const interval = setInterval(fetchFilters, 5000)
+    return () => clearInterval(interval)
+  }, [])
 
-  const getSystemIcon = (type) => {
-    switch (type) {
-      case "Primary Server":
-        return <Server className="w-6 h-6" />
-      case "Database":
-        return <Database className="w-6 h-6" />
-      case "Firewall":
-        return <Shield className="w-6 h-6" />
-      case "Network":
-        return <Wifi className="w-6 h-6" />
-      case "Storage":
-        return <HardDrive className="w-6 h-6" />
-      case "Processing":
-        return <Cpu className="w-6 h-6" />
-      default:
-        return <Server className="w-6 h-6" />
-    }
-  }
-
-  const getHealthColor = (health) => {
-    if (health >= 95) return "text-white"
-    if (health >= 85) return "text-white"
-    if (health >= 70) return "text-orange-500"
-    return "text-red-500"
-  }
+  const dropCount = filters.filter(f => f.action === "drop").length
+  const acceptCount = filters.filter(f => f.action === "accept").length
+  const totalPackets = filters.reduce((acc, f) => acc + (parseInt(f.packets) || 0), 0)
 
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-cyan-500/20 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-wider">SYSTEMS MONITOR</h1>
-          <p className="text-sm text-neutral-400">Infrastructure health and performance monitoring</p>
+          <h1 className="text-2xl font-bold text-cyan-400 tracking-tighter italic">STAGE 4: CYBER SECURITY OPS</h1>
+          <p className="text-[10px] text-neutral-500 font-mono tracking-widest uppercase">Firewall Filtering & Threat Deflection Layer</p>
         </div>
         <div className="flex gap-2">
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white">System Scan</Button>
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white">Maintenance Mode</Button>
+          <Button className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 text-xs font-bold font-mono">
+            EMERGENCY LOCKDOWN
+          </Button>
+          <Button className="bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 text-xs font-bold font-mono">
+            SECURITY LOGS
+          </Button>
         </div>
       </div>
 
-      {/* System Overview Stats */}
+      {/* Security Status Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-neutral-900 border-neutral-700">
+        <Card className="bg-neutral-900 border-neutral-700 border-l-4 border-l-red-500">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-neutral-400 tracking-wider">SYSTEMS ONLINE</p>
-                <p className="text-2xl font-bold text-white font-mono">24/26</p>
+                <p className="text-[10px] text-neutral-500 tracking-wider font-bold">DROP RULES</p>
+                <p className="text-2xl font-bold text-white font-mono">{loading ? "..." : dropCount}</p>
               </div>
-              <CheckCircle className="w-8 h-8 text-white" />
+              <Flame className="w-8 h-8 text-red-500 opacity-50" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-neutral-900 border-neutral-700 border-l-4 border-l-cyan-500">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] text-neutral-500 tracking-wider font-bold">ACCEPT RULES</p>
+                <p className="text-2xl font-bold text-white font-mono">{loading ? "..." : acceptCount}</p>
+              </div>
+              <ShieldCheck className="w-8 h-8 text-cyan-500 opacity-50" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-neutral-900 border-neutral-700">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-neutral-400 tracking-wider">WARNINGS</p>
-                <p className="text-2xl font-bold text-orange-500 font-mono">3</p>
-              </div>
-              <AlertTriangle className="w-8 h-8 text-orange-500" />
-            </div>
+          <CardContent className="p-4 text-center">
+            <p className="text-[10px] text-neutral-500 tracking-wider font-bold mb-1 uppercase">Total Packets Filtered</p>
+            <p className="text-xl font-bold text-cyan-400 font-mono tracking-tighter">
+              {loading ? "..." : totalPackets.toLocaleString()}
+            </p>
           </CardContent>
         </Card>
 
         <Card className="bg-neutral-900 border-neutral-700">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-neutral-400 tracking-wider">AVG UPTIME</p>
-                <p className="text-2xl font-bold text-white font-mono">99.7%</p>
-              </div>
-              <Activity className="w-8 h-8 text-white" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-neutral-900 border-neutral-700">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-neutral-400 tracking-wider">MAINTENANCE</p>
-                <p className="text-2xl font-bold text-neutral-300 font-mono">1</p>
-              </div>
-              <Settings className="w-8 h-8 text-neutral-300" />
+          <CardContent className="p-4 text-center text-cyan-400">
+            <div className="text-[10px] font-bold uppercase tracking-widest mb-1 text-neutral-500">Node Threat Status</div>
+            <div className="text-sm font-bold flex items-center justify-center gap-2">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
+              SECURE
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Systems Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {systems.map((system) => (
-          <Card
-            key={system.id}
-            className="bg-neutral-900 border-neutral-700 hover:border-orange-500/50 transition-colors cursor-pointer"
-            onClick={() => setSelectedSystem(system)}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  {getSystemIcon(system.type)}
-                  <div>
-                    <CardTitle className="text-sm font-bold text-white tracking-wider">{system.name}</CardTitle>
-                    <p className="text-xs text-neutral-400">{system.type}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(system.status)}
-                  <Badge className={getStatusColor(system.status)}>{system.status.toUpperCase()}</Badge>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-neutral-400">SYSTEM HEALTH</span>
-                <span className={`text-sm font-bold font-mono ${getHealthColor(system.health)}`}>{system.health}%</span>
-              </div>
-              <Progress value={system.health} className="h-2" />
-
-              <div className="grid grid-cols-3 gap-4 text-xs">
-                <div>
-                  <div className="text-neutral-400 mb-1">CPU</div>
-                  <div className="text-white font-mono">{system.cpu}%</div>
-                  <div className="w-full bg-neutral-800 rounded-full h-1 mt-1">
-                    <div
-                      className="bg-orange-500 h-1 rounded-full transition-all duration-300"
-                      style={{ width: `${system.cpu}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="text-neutral-400 mb-1">MEMORY</div>
-                  <div className="text-white font-mono">{system.memory}%</div>
-                  <div className="w-full bg-neutral-800 rounded-full h-1 mt-1">
-                    <div
-                      className="bg-orange-500 h-1 rounded-full transition-all duration-300"
-                      style={{ width: `${system.memory}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="text-neutral-400 mb-1">STORAGE</div>
-                  <div className="text-white font-mono">{system.storage}%</div>
-                  <div className="w-full bg-neutral-800 rounded-full h-1 mt-1">
-                    <div
-                      className="bg-orange-500 h-1 rounded-full transition-all duration-300"
-                      style={{ width: `${system.storage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-1 text-xs text-neutral-400">
-                <div className="flex justify-between">
-                  <span>Uptime:</span>
-                  <span className="text-white font-mono">{system.uptime}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Location:</span>
-                  <span className="text-white">{system.location}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* System Detail Modal */}
-      {selectedSystem && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="bg-neutral-900 border-neutral-700 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div className="flex items-center gap-3">
-                {getSystemIcon(selectedSystem.type)}
-                <div>
-                  <CardTitle className="text-xl font-bold text-white tracking-wider">{selectedSystem.name}</CardTitle>
-                  <p className="text-sm text-neutral-400">
-                    {selectedSystem.id} • {selectedSystem.type}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                onClick={() => setSelectedSystem(null)}
-                className="text-neutral-400 hover:text-white"
-              >
-                ✕
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-neutral-300 tracking-wider mb-2">SYSTEM STATUS</h3>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(selectedSystem.status)}
-                      <Badge className={getStatusColor(selectedSystem.status)}>
-                        {selectedSystem.status.toUpperCase()}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-medium text-neutral-300 tracking-wider mb-2">SYSTEM INFORMATION</h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-neutral-400">Location:</span>
-                        <span className="text-white">{selectedSystem.location}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-neutral-400">Uptime:</span>
-                        <span className="text-white font-mono">{selectedSystem.uptime}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-neutral-400">Last Maintenance:</span>
-                        <span className="text-white font-mono">{selectedSystem.lastMaintenance}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-neutral-400">Health Score:</span>
-                        <span className={`font-mono ${getHealthColor(selectedSystem.health)}`}>
-                          {selectedSystem.health}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-neutral-300 tracking-wider mb-2">RESOURCE USAGE</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span className="text-neutral-400">CPU Usage</span>
-                          <span className="text-white font-mono">{selectedSystem.cpu}%</span>
-                        </div>
-                        <div className="w-full bg-neutral-800 rounded-full h-2">
-                          <div
-                            className="bg-orange-500 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${selectedSystem.cpu}%` }}
-                          ></div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span className="text-neutral-400">Memory Usage</span>
-                          <span className="text-white font-mono">{selectedSystem.memory}%</span>
-                        </div>
-                        <div className="w-full bg-neutral-800 rounded-full h-2">
-                          <div
-                            className="bg-orange-500 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${selectedSystem.memory}%` }}
-                          ></div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span className="text-neutral-400">Storage Usage</span>
-                          <span className="text-white font-mono">{selectedSystem.storage}%</span>
-                        </div>
-                        <div className="w-full bg-neutral-800 rounded-full h-2">
-                          <div
-                            className="bg-orange-500 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${selectedSystem.storage}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-2 pt-4 border-t border-neutral-700">
-                <Button className="bg-orange-500 hover:bg-orange-600 text-white">Restart System</Button>
-                <Button
-                  variant="outline"
-                  className="border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300 bg-transparent"
-                >
-                  View Logs
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300 bg-transparent"
-                >
-                  Schedule Maintenance
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {/* Firewall Rules Table */}
+      <Card className="bg-neutral-900/90 border-neutral-700 backdrop-blur-md">
+        <CardHeader className="bg-neutral-950/50 border-b border-neutral-800">
+          <CardTitle className="text-[10px] font-bold text-cyan-400 tracking-[0.3em] flex items-center gap-2">
+            <Terminal className="w-3 h-3" />
+            LIVE FILTER ENGINE
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-neutral-800 text-[10px] text-neutral-500 uppercase font-bold tracking-widest">
+                  <th className="px-6 py-4">#</th>
+                  <th className="px-6 py-4">ACTION</th>
+                  <th className="px-6 py-4">CHAIN</th>
+                  <th className="px-6 py-4">SRC / DST</th>
+                  <th className="px-6 py-4">PACKETS / BYTES</th>
+                  <th className="px-6 py-4">STATUS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-800 font-mono text-[10px]">
+                {loading ? (
+                  <tr><td colSpan={6} className="py-20 text-center animate-pulse">ANALYZING FIREWALL LOGS...</td></tr>
+                ) : filters.map((rule, index) => (
+                  <tr key={rule.id} className="hover:bg-neutral-800/50 transition-colors">
+                    <td className="px-6 py-4 text-neutral-500">[{index}]</td>
+                    <td className="px-6 py-4">
+                      <span className={`font-bold uppercase ${rule.action === "drop" ? "text-red-500" : rule.action === "accept" ? "text-green-500" : "text-yellow-500"}`}>
+                        {rule.action}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-white uppercase">{rule.chain}</td>
+                    <td className="px-6 py-4">
+                      <div className="text-neutral-400">SRC: {rule["src-address"] || "any"}</div>
+                      <div className="text-neutral-400">DST: {rule["dst-address"] || "any"}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-white">{rule.packets} pkts</div>
+                      <div className="text-neutral-500">{(parseInt(rule.bytes) / 1024).toFixed(1)} KB</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={rule.disabled === "false" ? "text-cyan-400" : "text-neutral-600"}>
+                        {rule.disabled === "false" ? "ACTIVE" : "INACTIVE"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
