@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Filter, MoreHorizontal, Activity, Cpu, Zap, Radio } from "lucide-react"
+import { Search, Filter, MoreHorizontal, Activity, Cpu, Zap, Radio, Power } from "lucide-react"
 
 export default function CablingPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -38,6 +38,24 @@ export default function CablingPage() {
 
   const activeCount = interfaces.filter(i => i.running === "true").length
   const disabledCount = interfaces.filter(i => i.disabled === "true").length
+
+  const handleToggle = async (id: string, currentDisabled: string) => {
+    try {
+      const res = await fetch("/api/mikrotik/interfaces/toggle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, disabled: currentDisabled === "false" }) // Toggle current state
+      })
+      if (res.ok) {
+        // Refresh data immediately
+        const refreshRes = await fetch("/api/mikrotik/interfaces")
+        const newData = await refreshRes.json()
+        setInterfaces(newData)
+      }
+    } catch (error) {
+      console.error("Failed to toggle interface:", error)
+    }
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -162,7 +180,20 @@ export default function CablingPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6">
+                    <td className="py-4 px-6 flex items-center gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleToggle(iface[".id"], iface.disabled)}
+                        className={`w-8 h-8 rounded-full border transition-all ${
+                          iface.disabled === "false" 
+                            ? "border-cyan-500/30 text-cyan-400 hover:bg-red-500/20 hover:text-red-500 hover:border-red-500/50" 
+                            : "border-neutral-700 text-neutral-600 hover:bg-cyan-500/20 hover:text-cyan-400 hover:border-cyan-500/50"
+                        }`}
+                        title={iface.disabled === "false" ? "Disable Interface" : "Enable Interface"}
+                      >
+                        <Power className="w-3.5 h-3.5" />
+                      </Button>
                       <Button variant="ghost" size="icon" className="text-neutral-500 hover:text-cyan-400 group-hover:bg-cyan-500/10">
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>

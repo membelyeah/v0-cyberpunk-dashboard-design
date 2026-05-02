@@ -34,6 +34,23 @@ export default function ITNSAPage() {
   const waitingCount = leases.filter(l => l.status === "waiting" || l.status === "offered").length
   const staticCount = leases.filter(l => l.dynamic === "false").length
 
+  const handleBlacklist = async (ip: string, hostname: string) => {
+    if (!confirm(`Are you sure you want to BLACKLIST ${hostname} (${ip})?`)) return
+    
+    try {
+      const res = await fetch("/api/mikrotik/blacklist/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ip, comment: `Banned: ${hostname}` })
+      })
+      if (res.ok) {
+        alert(`${hostname} has been added to Stage 4 (Cyber Sec) Blacklist.`)
+      }
+    } catch (error) {
+      console.error("Failed to blacklist device:", error)
+    }
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -139,8 +156,20 @@ export default function ITNSAPage() {
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-neutral-800/50 text-[9px] text-neutral-600 italic">
-                SERVER: {lease.server}
+              <div className="pt-2 border-t border-neutral-800/50 flex justify-between items-center">
+                <span className="text-[9px] text-neutral-600 italic">SERVER: {lease.server}</span>
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleBlacklist(lease.address, lease["host-name"] || lease["mac-address"]);
+                  }}
+                  className="h-6 px-2 text-[8px] font-bold text-red-500 hover:bg-red-500/10 hover:text-red-400 gap-1 border border-red-500/20"
+                >
+                  <ShieldAlert className="w-2.5 h-2.5" />
+                  BAN IP
+                </Button>
               </div>
             </CardContent>
           </Card>
