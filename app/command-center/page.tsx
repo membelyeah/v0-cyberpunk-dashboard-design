@@ -9,22 +9,25 @@ export default function CommandCenterPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Agent Status Overview */}
         <Card className="lg:col-span-4 bg-neutral-900 border-neutral-700">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-neutral-300 tracking-wider">AGENT ALLOCATION</CardTitle>
+          <CardHeader className="pb-3 border-b border-cyan-500/20 bg-cyan-500/5">
+            <CardTitle className="text-[10px] font-bold text-cyan-400 tracking-[0.2em] flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse"></span>
+              IP STAGE ALLOCATION
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-white font-mono">190</div>
-                <div className="text-xs text-neutral-500">Active Field</div>
+                <div className="text-2xl font-bold text-white font-mono tracking-tighter">42</div>
+                <div className="text-[10px] text-neutral-500 uppercase">Stage 1</div>
+              </div>
+              <div className="text-center border-x border-neutral-800">
+                <div className="text-2xl font-bold text-white font-mono tracking-tighter">18</div>
+                <div className="text-[10px] text-neutral-500 uppercase">Stage 2</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-white font-mono">990</div>
-                <div className="text-xs text-neutral-500">Undercover</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white font-mono">290</div>
-                <div className="text-xs text-neutral-500">Training</div>
+                <div className="text-2xl font-bold text-white font-mono tracking-tighter">05</div>
+                <div className="text-[10px] text-neutral-500 uppercase">Stage 4</div>
               </div>
             </div>
 
@@ -62,8 +65,11 @@ export default function CommandCenterPage() {
 
         {/* Activity Log */}
         <Card className="lg:col-span-4 bg-neutral-900 border-neutral-700">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-neutral-300 tracking-wider">ACTIVITY LOG</CardTitle>
+          <CardHeader className="pb-3 border-b border-cyan-500/20 bg-cyan-500/5">
+            <CardTitle className="text-[10px] font-bold text-cyan-400 tracking-[0.2em] flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse"></span>
+              SECURITY EVENTS
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3 max-h-80 overflow-y-auto">
@@ -106,16 +112,16 @@ export default function CommandCenterPage() {
               ].map((log, index) => (
                 <div
                   key={index}
-                  className="text-xs border-l-2 border-orange-500 pl-3 hover:bg-neutral-800 p-2 rounded transition-colors"
+                  className="text-[10px] border-l-2 border-cyan-500 pl-3 hover:bg-cyan-500/5 p-2 rounded transition-colors group"
                 >
-                  <div className="text-neutral-500 font-mono">{log.time}</div>
-                  <div className="text-white">
-                    Agent <span className="text-orange-500 font-mono">{log.agent}</span> {log.action}{" "}
-                    <span className="text-white font-mono">{log.location}</span>
+                  <div className="text-neutral-500 font-mono mb-1">{log.time}</div>
+                  <div className="text-neutral-300">
+                    <span className="text-cyan-400 font-bold font-mono">GATEWAY_WAF:</span> {log.action}{" "}
+                    <span className="text-white font-bold">{log.location}</span>
                     {log.target && (
                       <span>
                         {" "}
-                        with agent <span className="text-orange-500 font-mono">{log.target}</span>
+                        node <span className="text-cyan-400 font-mono">{log.target}</span>
                       </span>
                     )}
                   </div>
@@ -151,8 +157,8 @@ export default function CommandCenterPage() {
               <div className="flex justify-between">
                 <span># 2025-06-17 14:23 UTC</span>
               </div>
-              <div className="text-white">{"> [AGT:gh0stfire] ::: INIT >> ^^^ loading secure channel"}</div>
-              <div className="text-orange-500">{"> CH#2 | 1231.9082464.500...xR3"}</div>
+              <div className="text-white">{"> [SYS:KERNEL] ::: LOAD >> modules/waf_filter"}</div>
+              <div className="text-cyan-400">{"> REST_API | 192.168.8.1:443...OK"}</div>
               <div className="text-white">{"> KEY LOCKED"}</div>
               <div className="text-neutral-400">
                 {'> MSG >> "...mission override initiated... awaiting delta node clearance"'}
@@ -163,9 +169,10 @@ export default function CommandCenterPage() {
 
         {/* Mission Activity Chart */}
         <Card className="lg:col-span-8 bg-neutral-900 border-neutral-700">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-neutral-300 tracking-wider">
-              MISSION ACTIVITY OVERVIEW
+          <CardHeader className="pb-3 border-b border-cyan-500/20 bg-cyan-500/5">
+            <CardTitle className="text-[10px] font-bold text-cyan-400 tracking-[0.2em] flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse"></span>
+              TRAFFIC MONITORING (Mbps)
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -182,8 +189,9 @@ export default function CommandCenterPage() {
                 <polyline
                   points="0,120 50,100 100,110 150,90 200,95 250,85 300,100 350,80"
                   fill="none"
-                  stroke="#f97316"
+                  stroke="#22d3ee"
                   strokeWidth="2"
+                  className="drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]"
                 />
                 <polyline
                   points="0,140 50,135 100,130 150,125 200,130 250,135 300,125 350,120"
@@ -213,8 +221,11 @@ export default function CommandCenterPage() {
 
         {/* Mission Information */}
         <Card className="lg:col-span-4 bg-neutral-900 border-neutral-700">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-neutral-300 tracking-wider">MISSION INFORMATION</CardTitle>
+          <CardHeader className="pb-3 border-b border-cyan-500/20 bg-cyan-500/5">
+            <CardTitle className="text-[10px] font-bold text-cyan-400 tracking-[0.2em] flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse"></span>
+              NETWORK SUMMARY
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
