@@ -1,8 +1,35 @@
-"use client"
-
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function CommandCenterPage() {
+  const [stats, setStats] = useState<any>(null)
+  const [addressLists, setAddressLists] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [statsRes, addrRes] = await Promise.all([
+          fetch("/api/mikrotik/stats"),
+          fetch("/api/mikrotik/address-list")
+        ])
+        
+        const statsData = await statsRes.json()
+        const addrData = await addrRes.json()
+        
+        setStats(statsData)
+        setAddressLists(addrData.stages)
+        setLoading(false)
+      } catch (error) {
+        console.error("Failed to fetch MikroTik data:", error)
+      }
+    }
+
+    fetchData()
+    const interval = setInterval(fetchData, 5000) // Poll every 5s
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className="p-6 space-y-6">
       {/* Main Dashboard Grid */}
@@ -18,15 +45,21 @@ export default function CommandCenterPage() {
           <CardContent>
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-white font-mono tracking-tighter">42</div>
+                <div className="text-2xl font-bold text-white font-mono tracking-tighter">
+                  {loading ? "..." : addressLists?.stage1 || 0}
+                </div>
                 <div className="text-[10px] text-neutral-500 uppercase">Stage 1</div>
               </div>
               <div className="text-center border-x border-neutral-800">
-                <div className="text-2xl font-bold text-white font-mono tracking-tighter">18</div>
+                <div className="text-2xl font-bold text-white font-mono tracking-tighter">
+                  {loading ? "..." : addressLists?.stage2 || 0}
+                </div>
                 <div className="text-[10px] text-neutral-500 uppercase">Stage 2</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-white font-mono tracking-tighter">05</div>
+                <div className="text-2xl font-bold text-white font-mono tracking-tighter">
+                  {loading ? "..." : addressLists?.stage4 || 0}
+                </div>
                 <div className="text-[10px] text-neutral-500 uppercase">Stage 4</div>
               </div>
             </div>
@@ -228,46 +261,29 @@ export default function CommandCenterPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-xs text-white font-medium">Successful Missions</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 font-mono text-[10px]">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">IDENTITY:</span>
+                  <span className="text-cyan-400 font-bold">{loading ? "CONNECTING..." : stats?.identity}</span>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-neutral-400">High Risk Mission</span>
-                    <span className="text-white font-bold font-mono">190</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-neutral-400">Medium Risk Mission</span>
-                    <span className="text-white font-bold font-mono">426</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-neutral-400">Low Risk Mission</span>
-                    <span className="text-white font-bold font-mono">920</span>
-                  </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">BOARD:</span>
+                  <span className="text-white">{loading ? "..." : stats?.board}</span>
                 </div>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <span className="text-xs text-red-500 font-medium">Failed Missions</span>
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">UPTIME:</span>
+                  <span className="text-white">{loading ? "..." : stats?.uptime}</span>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-neutral-400">High Risk Mission</span>
-                    <span className="text-white font-bold font-mono">190</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-neutral-400">Medium Risk Mission</span>
-                    <span className="text-white font-bold font-mono">426</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-neutral-400">Low Risk Mission</span>
-                    <span className="text-white font-bold font-mono">920</span>
-                  </div>
+                <div className="flex justify-between border-t border-neutral-800 pt-2">
+                  <span className="text-neutral-500">CPU LOAD:</span>
+                  <span className={stats?.cpuLoad > 80 ? "text-red-500" : "text-green-500"}>
+                    {loading ? "..." : `${stats?.cpuLoad}%`}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">TOTAL NODES:</span>
+                  <span className="text-white">{loading ? "..." : addressLists?.total || 0}</span>
                 </div>
               </div>
             </div>
